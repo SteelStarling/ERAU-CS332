@@ -35,19 +35,24 @@ int main() {
     ibuf.map(TablePrint());
     // print the numbers all in a row using a lambda
 
-    /* %% TODO: your code goes here %% */
+    ibuf.map( [](int i){ cout << i << " "; } );
+    cout << endl;
 
     // sort the numbers low to high using a lambda for the compare
 
-    /* %% TODO: your code goes here %% */
+    ibuf.sort( [](int x, int y){ return x > y; } );
 
     // compute the sum and average using a closure here
 
-    /* %% TODO: your code goes here %% */
+    int sum = 0;
+    int count = 0;
+    ibuf.map([&](int i){ sum += i; count++; });
+    cout << "The average is: " << (float)sum / count << endl;
 
     // print a table like the one above, only this time using a closure
 
-    /* %% TODO: your code goes here %% */
+    int column = 0;
+    ibuf.map([&](int i){ cout << setw(5) << i; column++; if(column > 9) { column = 0; cout << endl; }});
 
     cout << endl;
     return 0;
