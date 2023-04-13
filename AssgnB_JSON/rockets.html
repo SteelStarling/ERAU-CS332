@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+  h1 {
+    text-align: center;
+  }
+
+  img {
+    height: 150px;
+  }
+
+  div {
+    text-align: center;
+    padding: 10px;
+  }
+
+  input {
+    margin: 5px;
+  }
+
+  .correct {
+    border-color: green;
+  }
+
+  .wrong {
+    border-color: red;
+  }
+</style>
+<script src="rockets.js"></script>
+<script>
+  /* create a random order for going through the pictures */
+  var order = [];
+  /* randomize indexes for the choices. To show 4 choices,
+     swap the correct choice with 0, then just use the first 4 */
+  var map = [];
+  /* since correct choice is always 0, randomize the buttons, too */
+  var btnMap = [0, 1, 2, 3];
+  /* button elements as an array so we can loop through them */
+  var btn = [];
+  /* img element */
+  var picture;
+  var score = 0;
+  var outOf = 0;
+  /* index for going through the order[] list for each picture */
+  var chosen = 0;
+  
+  /* populate an array with length index values in sequence */
+  function populateSequence(arr, length) {
+    for (i = 0; i < length; i++)
+      arr.push(i);
+  }
+
+  /* shuffle an array */
+  function shuffle(arr) {
+    for (i = 0; i < arr.length; i++) {
+      var j = Math.floor(Math.random() * arr.length);
+      var temp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = temp;
+    }
+  }
+
+  /* in listener, check if button shows correct answer (map[0]) */
+  function check() {
+    if (this.getAttribute("value") == data[map[0]].name) {
+      score++;
+      document.getElementById("score").innerHTML = score;
+      document.getElementById("major").innerHTML = data[map[0]].title;
+    } else {
+      this.setAttribute("class", "wrong");
+    }
+    outOf++;
+    document.getElementById("outOf").innerHTML = outOf;
+    showAnswer();
+  }
+
+  function showAnswer() {
+    btn[btnMap[0]].setAttribute("class", "correct");
+  }
+
+  /* find next name in list with same gender and swap */
+  function genderReplace(indexOfChoice) {
+    var temp = map[indexOfChoice];
+    for (j = 4; j < map.length; j++) {
+      if (data[map[j]].gender == data[map[0]].gender) {
+        map[indexOfChoice] = map[j];
+        map[j] = temp;
+        j = map.length;
+      }
+    }
+  }
+  
+  /* check each choice to have same gender as answer */
+  function genderAdjust() {
+    for (i = 1; i < 4; i++) {
+      if (data[map[i]].gender != data[map[0]].gender) {
+        genderReplace(i);
+      }
+    }
+  }
+
+  /* shuffle, then swap correct answer with first element */
+  function shuffleMap(indexOfAnswer) {
+    shuffle(map);
+    for (i = 0; i < map.length && map[i] != indexOfAnswer; i++);
+    var temp = map[0];
+    map[0] = map[i];
+    map[i] = temp;
+    /* make sure the first four choices have same gender */
+    genderAdjust();
+  }
+
+  /* advance person to be displayed */
+  function updateChosen() {
+    /* advance to next picture */
+    chosen++;
+    /* if reached end, reshuffle and start again */
+    if (chosen >= order.length) {
+      shuffle(order);
+      chosen = 0;
+    }
+  }
+
+  function goNext() {
+    updateChosen();
+    /* shuffle the choices, and put chosen first */
+    shuffleMap(order[chosen]);
+    /* shuffle the buttons for each choice */
+    shuffle(btn);
+    /* populate the buttons */
+    for (i = 0; i < 4; i++) {
+      btn[i].setAttribute("value", data[map[i]].name);
+      btn[i].setAttribute("class", "");
+    }
+    /* display the chosen one's picture */
+    picture.setAttribute("src", "images/" + data[map[0]].picture);
+    /* clear the display of major */
+    document.getElementById("major").innerHTML = "";
+  }
+
+  function start() {
+    document.getElementById("data_title").innerHTML = title;
+    populateSequence(order, data.length);
+    populateSequence(map, data.length);
+    picture = document.getElementById("picture");
+    for (i = 0; i < 4; i++) {
+      btn.push(document.getElementById("btn" + i));
+      btn[i].addEventListener("click", check, false);
+    }
+    document.getElementById("next").addEventListener("click", goNext, false);
+    document.getElementById("show").addEventListener("click", showAnswer, false);
+    chosen = order.length;
+    goNext();
+  }
+  window.addEventListener("load", start, "false");
+</script>
+</head>
+
+<body>
+  <h1 id="data_title">Flash Cards</h1>
+  <div>
+    <img id="picture" src="">
+  </div>
+  <form>
+    <div>
+      <input id="btn0" type="button" value="">
+      <input id="btn1" type="button" value="">
+      <input id="btn2" type="button" value="">
+      <input id="btn3" type="button" value="">
+    </div>
+    <div>
+      <input id="show" type="button" value="Answer">
+      <span id="score">0</span>/<span id="outOf">0</span>
+      <input id="next" type="button" value="Next">
+    </div>
+    <div>
+      <span id="major">""</span>
+    </div>
+  </form>
+</body>
+
+</html>
